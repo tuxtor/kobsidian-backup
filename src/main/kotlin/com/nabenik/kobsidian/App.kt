@@ -16,7 +16,7 @@ class App{
 
             val backupFolder = args[0]
             val dbName = args[1]
-            val backupName = dbName + "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm:ss")) + ".backup"
+            val backupName = dbName + "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) + ".backup"
 
             //1- Create backup
             val backupCreator = PgBackupCreator()
@@ -27,7 +27,7 @@ class App{
 
             //3- Upload to destination
             val credential = Credential("tuxtor",
-                    "sl.AbLwVOckU0uaGQcoDe1knZgfVuPr5qvDoNiahhfOUnJOykVdEp4HZ444Aevvj6DQ13ECddTXvhX810ER-_wLgpYKHJbohAyq8S_FRhwRFrjNOn5KGNvMrnSqTrLAZuKzjmZd9XFP")
+                    "sl.AbIwQQYFsUeStPOvOtySR2UquDlQ2TQCjxGak4SQYpotqL9WKxL7Xy_ZYqIS2vPi6U2xOnXVkV4TweeqGo_1DDQrwddnvtVLyA1X-HS3eGU8gmnDMQ4MhxjpeLjosTvvF41_BkJi")
             val client = DropboxClient(credential)
 
             val result = client.uploadData(backupName, inputStream)
