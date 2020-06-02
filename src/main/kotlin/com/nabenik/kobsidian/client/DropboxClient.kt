@@ -2,12 +2,12 @@ package com.nabenik.kobsidian.client
 
 import com.dropbox.core.DbxRequestConfig
 import com.dropbox.core.v2.DbxClientV2
-import java.io.File
 import java.io.InputStream
-import java.util.stream.Stream
 
 /**
  * Connects and uploads backup file to dropbox
+ *
+ * @author tuxtor
  */
 class DropboxClient(credential: Credential) :
     UploadClient {
