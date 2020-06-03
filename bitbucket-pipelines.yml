@@ -14,6 +14,8 @@ pipelines:
             - maven
           script:
             - mvn -B clean verify
+          artifacts:
+            - target/**
       - step:
           name: Deploy artifacts using SCP to PROD
           deployment: production
