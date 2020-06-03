@@ -151,6 +151,13 @@
                     </buildArgs>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>com.amashchenko.maven.plugin</groupId>
+                <artifactId>gitflow-maven-plugin</artifactId>
+                <version>1.14.0</version>
+                <configuration>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
