@@ -155,7 +155,71 @@
                 <groupId>com.amashchenko.maven.plugin</groupId>
                 <artifactId>gitflow-maven-plugin</artifactId>
                 <version>1.14.0</version>
+            </plugin>
+            <plugin>
+                <groupId>de.dentrassi.maven</groupId>
+                <artifactId>rpm</artifactId>
+                <version>1.5.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>rpm</goal>
+                        </goals>
+                        <phase>verify</phase>
+                    </execution>
+                </executions>
                 <configuration>
+                    <attach>false</attach>
+                    <group>Application/Misc</group>
+                    <skipSigning>true</skipSigning>
+                    <outputFileName>kobsidian-backup-${project.version}.noarch.rpm</outputFileName>
+                    <!--files>
+                        <file>${project.build.directory}/kobsidian-backup-${project.version}.noarch.rpm</file>
+                    </files-->
+                    <rulesets>
+                        <ruleset>
+                            <id>my-default</id>
+                            <rules>
+                                <rule>
+                                    <when>
+                                        <type>directory</type>
+                                    </when>
+                                    <mode>0750</mode>
+                                </rule>
+                                <rule>
+                                    <when>
+                                        <prefix>/etc/</prefix>
+                                    </when>
+                                    <configuration>true</configuration>
+                                </rule>
+                            </rules>
+                        </ruleset>
+                    </rulesets>
+                    <entries>
+                        <entry>
+                            <name>/etc/kobsidian</name>
+                            <directory>true</directory>
+                            <user>postgres</user>
+                            <group>postgres</group>
+                            <mode>0755</mode>
+                            <ruleset>my-default</ruleset>
+                        </entry>
+                        <entry>
+                            <name>/etc/kobsidian/kobsidian.properties</name>
+                            <file>src/test/resources/kobsidian.properties</file>
+                            <user>postgres</user>
+                            <group>postgres</group>
+                            <mode>0600</mode>
+                            <ruleset>my-default</ruleset>
+                        </entry>
+                        <entry>
+                            <name>/usr/local/sbin/kobsidian-backup</name>
+                            <user>postgres</user>
+                            <group>postgres</group>
+                            <file>${project.build.directory}/kobsidian-backup-${project.version}</file>
+                            <ruleset>my-default</ruleset>
+                        </entry>
+                    </entries>
                 </configuration>
             </plugin>
         </plugins>
