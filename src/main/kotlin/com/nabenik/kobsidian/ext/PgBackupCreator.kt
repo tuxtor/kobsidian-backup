@@ -30,7 +30,7 @@ class PgBackupCreator{
             val process = processBuilder.start()
             val outputReader = BufferedReader(InputStreamReader(process.errorStream))
 
-            var line: String? = null
+            var line: String?
             do {
                 line = outputReader.readLine()
                 println(line)

@@ -6,9 +6,16 @@
 image: tuxtor/graalvm-ce-native-maven:20.1.0-java11
 
 pipelines:
-  default:
-    - step:
-        caches:
-          - maven
-        script: # Modify the commands below to build your repository.
-          - mvn -B clean package # -B batch mode makes Maven less verbose
+  branches:
+    develop:
+      - step:
+          caches:
+            - maven
+          script:
+            - mvn -B clean package
+    master:
+      - step:
+          caches:
+            - maven
+          script:
+            - mvn -B clean verify

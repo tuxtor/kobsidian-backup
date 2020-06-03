@@ -9,15 +9,14 @@ import com.nabenik.kobsidian.filereader.SystemFileReader
 import picocli.CommandLine
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.Callable
 import kotlin.system.exitProcess
 
-@CommandLine.Command(name = "kobsidian-backup", mixinStandardHelpOptions = true, version = ["kobsidian-backup 1.0.0"],
-    description = ["Creates backups from Postgres and uploads these to Dropbox"])
 class App{
 
+    private lateinit var backupConfig: BackupOptions
 
-
-    fun call(backupConfig: BackupOptions):Int{
+    fun call():Int{
         val backupName = backupConfig.databaseName + "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) + ".backup"
 
         //1- Create backup
@@ -46,9 +45,9 @@ class App{
 
             //1- Parse CMD arguments
             val callableApp = App()
-            val cmd = CommandLine(callableApp);
+            val cmd = CommandLine(cmdOptions)
             try {
-                val cmdResult = CommandLine(cmdOptions).parseArgs(*args)
+                val cmdResult = cmd.parseArgs(*args)
                 if (cmd.isUsageHelpRequested) {
                     cmd.usage(cmd.out);
                     exitProcess(cmd.commandSpec.exitCodeOnUsageHelp())
@@ -62,8 +61,9 @@ class App{
                 val executionOptions = intersectProperties(cmdOptions, fileOptions)
                 checkArguments(cmd, executionOptions)
 
-                val result = callableApp.call(executionOptions);
-                cmd.setExecutionResult(result);
+                callableApp.backupConfig = executionOptions
+                val result = callableApp.call()
+                cmd.setExecutionResult(result)
                 exitProcess(cmd.commandSpec.exitCodeOnSuccess())
             }catch (ex: CommandLine.ParameterException) {
                 cmd.err.println(ex.message);

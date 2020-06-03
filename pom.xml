@@ -140,12 +140,12 @@
                         <goals>
                             <goal>native-image</goal>
                         </goals>
-                        <phase>package</phase>
+                        <phase>verify</phase>
                     </execution>
                 </executions>
                 <configuration>
                     <skip>false</skip>
-                    <imageName>kobsidian-backup-${version}</imageName>
+                    <imageName>kobsidian-backup-${project.version}</imageName>
                     <buildArgs>
                         --enable-https --no-fallback -H:IncludeResources="com.dropbox.core.trusted-certs.raw"
                     </buildArgs>
