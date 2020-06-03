@@ -1,13 +1,12 @@
 package com.nabenik.kobsidian.config
 
-import org.apache.commons.configuration2.builder.fluent.Configurations
 import java.io.File
 import java.lang.Exception
+import java.util.*
 
 object ConfigurationReader {
 
     fun readConfig(): BackupOptions {
-        val configs = Configurations()
         try {
             val configFile = when {
                 File("kobsidian.properties").exists() -> {
@@ -28,14 +27,16 @@ object ConfigurationReader {
             }
 
             if(configFile != null){
-                val config = configs.properties(configFile)
+                val prop = Properties()
+                prop.load(configFile.inputStream())
+
                 return BackupOptions(
-                    config.getString("database.name", null),
-                    config.getString("database.user", null),
-                    config.getString("database.password", null),
-                    config.getString("backup.folder", null),
-                    config.getString("dropbox.user", null),
-                    config.getString("dropbox.key", null)
+                    prop.getProperty("database.name", null),
+                    prop.getProperty("database.user", null),
+                    prop.getProperty("database.password", null),
+                    prop.getProperty("backup.folder", null),
+                    prop.getProperty("dropbox.user", null),
+                    prop.getProperty("dropbox.key", null)
                 )
                 //TODO read all properties
             }

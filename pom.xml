@@ -14,6 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>1.3.72</kotlin.version>
         <kotlin.code.style>official</kotlin.code.style>
+        <graalvm.version>20.1.0</graalvm.version>
         <junit.version>4.12</junit.version>
     </properties>
 
@@ -40,14 +41,10 @@
             <version>4.3.2</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-configuration2</artifactId>
-            <version>2.7</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-            <version>1.9.4</version>
+            <groupId>org.graalvm.sdk</groupId>
+            <artifactId>graal-sdk</artifactId>
+            <version>${graalvm.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -80,6 +77,24 @@
                         <goals>
                             <goal>test-compile</goal>
                         </goals>
+                    </execution>
+                    <execution>
+                        <id>kapt</id>
+                        <goals>
+                            <goal>kapt</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirs>
+                                <sourceDir>src/main/kotlin</sourceDir>
+                            </sourceDirs>
+                            <annotationProcessorPaths>
+                                <path>
+                                    <groupId>info.picocli</groupId>
+                                    <artifactId>picocli-codegen</artifactId>
+                                    <version>4.3.2</version>
+                                </path>
+                            </annotationProcessorPaths>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -117,24 +132,25 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <!-- annotationProcessorPaths requires maven-compiler-plugin version 3.5 or higher -->
-                <version>3.5.1</version>
+                <groupId>org.graalvm.nativeimage</groupId>
+                <artifactId>native-image-maven-plugin</artifactId>
+                <version>${graalvm.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>native-image</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
                 <configuration>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>info.picocli</groupId>
-                            <artifactId>picocli-codegen</artifactId>
-                            <version>4.3.2</version>
-                        </path>
-                    </annotationProcessorPaths>
-                    <compilerArgs>
-                        <arg>-Aproject=${project.groupId}/${project.artifactId}</arg>
-                    </compilerArgs>
+                    <skip>false</skip>
+                    <imageName>kobsidian-backup-${version}</imageName>
+                    <buildArgs>
+                        --enable-https --no-fallback -H:IncludeResources="com.dropbox.core.trusted-certs.raw"
+                    </buildArgs>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 
