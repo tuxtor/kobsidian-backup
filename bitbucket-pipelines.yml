@@ -14,4 +14,13 @@ pipelines:
             - maven
           script:
             - mvn -B clean verify
-            - scp -r target/*.rpm externossh@demo.nabenik.com:/var/www/clients/client4/web4/web/yum/
+      - step:
+          name: Deploy artifacts using SCP to PROD
+          deployment: production
+          script:
+            - pipe: atlassian/scp-deploy:0.3.3
+              variables:
+                USER: externossh
+                SERVER: demo.nabenik.com
+                REMOTE_PATH: '/var/www/clients/client4/web4/web/yum/'
+                LOCAL_PATH: 'target/*.rpm'
