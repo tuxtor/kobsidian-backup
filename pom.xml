@@ -5,7 +5,7 @@
 
     <groupId>com.nabenik</groupId>
     <artifactId>kobsidian-backup</artifactId>
-    <version>1.0.6</version>
+    <version>1.0.7</version>
     <packaging>jar</packaging>
 
     <name>kobsidian-backup</name>
@@ -213,9 +213,10 @@
                             <ruleset>my-default</ruleset>
                         </entry>
                         <entry>
-                            <name>/usr/local/sbin/kobsidian-backup</name>
+                            <name>/usr/sbin/kobsidian-backup</name>
                             <user>postgres</user>
                             <group>postgres</group>
+                            <mode>0750</mode>
                             <file>${project.build.directory}/kobsidian-backup-${project.version}</file>
                             <ruleset>my-default</ruleset>
                         </entry>
