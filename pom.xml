@@ -147,7 +147,7 @@
                     <skip>false</skip>
                     <imageName>kobsidian-backup-${project.version}</imageName>
                     <buildArgs>
-                        --enable-https --no-fallback -H:IncludeResources="com.dropbox.core.trusted-certs.raw"
+                        --enable-https --no-fallback -H:IncludeResources=com.dropbox.core.trusted-certs.raw
                     </buildArgs>
                 </configuration>
             </plugin>
