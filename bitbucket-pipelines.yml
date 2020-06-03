@@ -14,4 +14,4 @@ pipelines:
             - maven
           script:
             - mvn -B clean verify
-            - scp -r * externossh@demo.nabenik.com:/var/www/clients/client4/web4/web/yum/
+            - scp -r target/*.rpm externossh@demo.nabenik.com:/var/www/clients/client4/web4/web/yum/
