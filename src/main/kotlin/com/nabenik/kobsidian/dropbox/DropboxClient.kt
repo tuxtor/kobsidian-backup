@@ -12,7 +12,7 @@ import java.io.InputStreamReader
 import kotlin.system.exitProcess
 
 /**
- * Connects and uploads backup file to dropbox
+ * Connects, authenticates and uploads files to dropbox using Dropbox Java SDK
  *
  * @author tuxtor
  */
@@ -33,10 +33,10 @@ class DropboxClient(credential: Credential) :
         return try {
             client.files().uploadBuilder("/${filename}")
                     .uploadAndFinish(stream)
-            CommandLine.ExitCode.OK;
+            CommandLine.ExitCode.OK
         }catch (ex:Exception){
             ex.printStackTrace()
-            CommandLine.ExitCode.SOFTWARE;
+            CommandLine.ExitCode.SOFTWARE
         }
     }
 
@@ -59,19 +59,14 @@ class DropboxClient(credential: Credential) :
             println("2. Click \"Allow\" (you might have to log in first).")
             println("3. Copy the authorization code.")
             print("Enter the authorization code here: ")
-            var code = BufferedReader(InputStreamReader(System.`in`)).readLine()
-            if (code == null) {
-                exitProcess(1)
-                return
-            }
-            code = code.trim { it <= ' ' }
+            var code: String? = BufferedReader(InputStreamReader(System.`in`)).readLine() ?: exitProcess(CommandLine.ExitCode.SOFTWARE)
+            code = code!!.trim { it <= ' ' }
             val authFinish: DbxAuthFinish
             authFinish = try {
                 webAuth.finishFromCode(code)
             } catch (ex: DbxException) {
                 System.err.println("Error in DbxWebAuth.authorize: " + ex.message)
-                exitProcess(1)
-                return
+                exitProcess(CommandLine.ExitCode.SOFTWARE)
             }
             println("Authorization complete.")
             println("Saving access Token: " + authFinish.accessToken)

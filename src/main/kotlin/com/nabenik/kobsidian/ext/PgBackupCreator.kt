@@ -6,6 +6,11 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.lang.Exception
 
+/**
+ * General implementation for Postgres backup creation
+ *
+ * @author Victor Orozco
+ */
 class PgBackupCreator{
 
     /**
@@ -15,7 +20,6 @@ class PgBackupCreator{
      */
     fun doBackup(credential: Credential, dbName: String, destinationFile: String):Int{
 
-        val runtime = Runtime.getRuntime()
         val processBuilder = ProcessBuilder("pg_dump",
             "--host", "localhost",
             "--port", "5432",
@@ -42,7 +46,7 @@ class PgBackupCreator{
             return process.exitValue()
         }catch (ex: Exception){
             ex.printStackTrace()
-            return CommandLine.ExitCode.SOFTWARE;
+            return CommandLine.ExitCode.SOFTWARE
         }
     }
 }

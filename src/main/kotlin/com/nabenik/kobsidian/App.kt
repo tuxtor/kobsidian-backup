@@ -11,10 +11,18 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.system.exitProcess
 
+/**
+ * Kobsidian main class implementation. It uses @JvmStatic annotation on companion object to be compatible with any Java implementation
+ *
+ * @author Victor Orozco
+ */
 class App{
 
     private lateinit var backupConfig: BackupOptions
 
+    /**
+     * Creates instances for objects initialization and interaction
+     */
     fun call():Int{
         val backupName = if(!backupConfig.backupPrefix.isNullOrEmpty()) {
             backupConfig.backupPrefix + "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) + ".backup"
@@ -49,10 +57,10 @@ class App{
             try {
                 val cmdResult = cmd.parseArgs(*args)
                 if (cmd.isUsageHelpRequested) {
-                    cmd.usage(cmd.out);
+                    cmd.usage(cmd.out)
                     exitProcess(cmd.commandSpec.exitCodeOnUsageHelp())
                 } else if (cmd.isVersionHelpRequested) {
-                    cmd.printVersionHelp(cmd.out);
+                    cmd.printVersionHelp(cmd.out)
                     exitProcess(cmd.commandSpec.exitCodeOnVersionHelp())
                 }
 
@@ -72,13 +80,13 @@ class App{
                 cmd.setExecutionResult(result)
                 exitProcess(cmd.commandSpec.exitCodeOnSuccess())
             }catch (ex: CommandLine.ParameterException) {
-                cmd.err.println(ex.message);
+                cmd.err.println(ex.message)
                 if (!CommandLine.UnmatchedArgumentException.printSuggestions(ex, cmd.err)) {
-                    ex.commandLine.usage(cmd.err);
+                    ex.commandLine.usage(cmd.err)
                 }
                 exitProcess(cmd.commandSpec.exitCodeOnInvalidInput())
             }catch (ex: Exception) {
-                ex.printStackTrace(cmd.err);
+                ex.printStackTrace(cmd.err)
                 exitProcess(cmd.commandSpec.exitCodeOnExecutionException())
             }
         }
