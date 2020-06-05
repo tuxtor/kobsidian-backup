@@ -5,6 +5,11 @@ import java.io.OutputStream
 import java.lang.Exception
 import java.util.*
 
+/**
+ * Reads properties files looking for specific Kobsidian configurations
+ *
+ * @author Victor Orozco
+ */
 object ConfigurationReader {
 
     private fun loadConfigFile(): File?{
@@ -48,7 +53,7 @@ object ConfigurationReader {
             if(configFile != null){
                 val prop = Properties()
                 prop.load(configFile.inputStream())
-                prop.setProperty(key, value);
+                prop.setProperty(key, value)
                 prop.store(configFile.outputStream(), "")
             }
         }catch (ex: Exception){

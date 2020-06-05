@@ -2,7 +2,12 @@ package com.nabenik.kobsidian.config
 
 import picocli.CommandLine
 
-@CommandLine.Command(name = "kobsidian-backup", mixinStandardHelpOptions = true, version = ["kobsidian-backup 1.0.9"],
+/**
+ * Class that represents a DTO for moving backup configurations. It also holds PicoCLI annotations for arguments parsing.
+ *
+ * @author Victor Orozco
+ */
+@CommandLine.Command(name = "kobsidian-backup", mixinStandardHelpOptions = true, version = ["kobsidian-backup 1.0.10"],
     description = ["Creates backups from Postgres and uploads these to Dropbox"])
 class BackupOptions{
 
@@ -59,7 +64,7 @@ class BackupOptions{
     )
     var dropboxKey: String?
 
-    @CommandLine.Option(names = ["-a", "--dropbox-token"],
+    @CommandLine.Option(names = ["-a", "--dropbox-authorization"],
             paramLabel = "DROPBOX AUTH TOKEN", description = ["Dropbox authorization token"]
     )
     var dropboxAuthorizationToken: String?
@@ -73,6 +78,5 @@ class BackupOptions{
             paramLabel = "BOOTSTRAP AUTHORIZATION FLUX", description = ["Bootstraps dropbox authorization process"]
     )
     var bootstrapAuthorizationProcess = false
-
 
 }

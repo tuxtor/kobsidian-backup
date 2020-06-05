@@ -1,3 +1,5 @@
+![Kobsidian Logo](logo.png)
+
 # Kobsidian Backup
 Kobsidian backup is a backup command executor and file uploader written in Kotlin. It is aimed to receive backup parameters from config files and/or cli arguments to fire backups from native tools and upload these backups to http destinations.
 
@@ -5,7 +7,7 @@ The current implementation supports backing from
 
 * PostgreSQL
 
-And uploading the backups to
+And uploads backups to
 
 * Dropbox
 
@@ -16,16 +18,16 @@ Project configuration produces two targets:
 1. Jar without dependencies (aimed for tight integration with systems)
 2. Self contained Native Image (executable on Linux)
 
-The project was created with
+The project uses the following tools/libraries
 
 * GraalVM CE 20.1.0
 * Kotlin 1.3.72
-* PicoCLI 
-* DropboxSDK
+* PicoCLI 4.3.2
+* DropboxSDK 3.1.3
 
 ## Building
 
-To build this project you will need a GraalVM CE installation with native image and JAVA_HOME pointing to it:
+To build this project you need a [GraalVM CE](https://github.com/graalvm/graalvm-ce-builds/releases) installation with [Native Image](https://www.graalvm.org/docs/reference-manual/native-image/) and JAVA_HOME pointing to it.
 
 You could execute the following goal to obtain the jar version:
 
@@ -33,7 +35,7 @@ You could execute the following goal to obtain the jar version:
 mvn -B clean package
 ```
 
-And the following goal to obtain the Native Image version (tested on Linux and MacOS)
+And the following goal to obtain the Native Image version (tested on Linux and MacOS) with an RPM installer
 
 ```console
 mvn -B clean verify
@@ -41,14 +43,16 @@ mvn -B clean verify
 
 ## Minimal configuration
 
-At this time kobsidian offers the following arguments/properties:
+Currently kobsidian offers the following arguments/configuration properties:
 
 * Argument: ```--database```/Property: ```database.name``` - Database name/instance to be backuped  (mandatory)
 * Argument: ```--user```/Property: ```database.user``` - Database user with dump execution privileges
 * Argument: ```--password```/Property: ```database.password``` - Database password for the given user, interactive argument
 * Argument: ```--target```/Property: ```backup.folder``` - Local filesystem folder where backup will be saved  (mandatory)
-* Argument: ```--dropbox-user```/Property: ```dropbox.user``` - Dropbox user account name for backups upload  (mandatory)
-* Argument: ```--dropbox-key```/Property: ```dropbox.key``` - Dropbox Oauth Key for backups upload  (mandatory)
+* Argument: ```--backup-prefix```/Property: ```backup.prefix``` - Custom filename prefix for backup files
+* Argument: ```--dropbox-key```/Property: ```dropbox.key``` - Dropbox App Key for backups upload  (mandatory)
+* Argument: ```--dropbox-secret```/Property: ```dropbox.user``` - Dropbox App Secret for backups upload  (mandatory)
+* Argument: ```--dropbox-authorization```/Property: ```dropbox.auth``` - Dropbox App authorization token (retrieved by a server auth flux in Drobpox), (mandatory for uploads)
 
 As always, you could check command help:
 
@@ -58,29 +62,67 @@ Usage: kobsidian-backup [-hV] [-p[=DATABASE PASSWORD]] [-b=DROPBOX USER]
                         [-d=DATABASE NAME] [-k=DROPBOX KEY] [-t=DESTINATION 
                         FOLDER] [-u=DATABASE USER]
 Creates backups from Postgres and uploads these to Dropbox
-  -b, --dropbox-user=DROPBOX USER
-                             Dropbox user
+  -a, --dropbox-token=DROPBOX AUTH TOKEN
+                             Dropbox authorization token
+  -b, --bootstrap-auth       Bootstraps dropbox authorization process
   -d, --database=DATABASE NAME
                              Database target for backup actions
+  -f, --backup-prefix=OPTIONAL BACKUP PREFIX
+                             Optional backup prefix on backup uploads
   -h, --help                 Show this help message and exit.
   -k, --dropbox-key=DROPBOX KEY
                              Dropbox connection key
   -p, --password[=DATABASE PASSWORD]
                              Database password with backup privileges
+  -s, --dropbox-secret=DROPBOX SECRET
+                             Dropbox secret
   -t, --target=DESTINATION FOLDER
                              Destination folder for backup
   -u, --user=DATABASE USER   Database user with backup privileges
   -V, --version              Print version information and exit.
 
+
 ``` 
-Besides command line arguments, configuration could be saved by using [properties files](https://en.wikipedia.org/wiki/.properties). 
+Configuration could be saved by using [properties files](https://en.wikipedia.org/wiki/.properties). 
 
-Configuration follows a priority, hence it will stop on the first existing file using the following priority
+Configuration follows a priority, it will stop on the first existing file using the following priority
 
-0. `kobsidian.properties` - Next to executable
-1. `~/.kobsidianconfig` - Next to executable
-2. `/etc/kobsidian/kobsidian.properties` - Next to executable
+0. `kobsidian.properties` - Next to executable/Jar classpath
+1. `~/.kobsidianconfig` - User home directory
+2. `/etc/kobsidian/kobsidian.properties` - Etc global configuration file
 
+A sample `kobsidian.properties` file will be created on `/etc/kobsidian` if RPM installation is used
+
+## Using Kobsidian with Dropbox
+
+Kobsidian is a server CLI application, hence it uses [app authentication flow](https://www.dropbox.com/developers/reference/auth-types) where app secret and key is used to generate a Dropbox access Token.
+
+To use this application you need three elements:
+
+1. [A new Dropbox application](https://www.dropbox.com/developers/apps/create) for your account
+2. App's key and secret
+3. Dropbox's token generated by 'app authentication'
+
+The application uses a Dropbox Token that is retrieved interactively from command line execution (app secret and key are just for demonstration):
+
+```console
+kobsidian-backup -k uh5guw13zs12345 -s ggq3jopoq12345 -b
+1. Go to https://www.dropbox.com/oauth2/authorize?response_type=code&client_id=uh5guw13zs12345
+2. Click "Allow" (you might have to log in first).
+3. Copy the authorization code.
+Enter the authorization code here: e8e2sLNmNloAAAAAAAB3or6PC_OZDeIrGDM_CI12345
+Authorization complete.
+Saving access Token: reallylongaccestokenthisoneisfakeT2dfjmKQvBqz-u2oV9DpKNj
+```
+
+Access token will be saved automatically on the first existing properties file.
+
+Once access configuration is complete, you could fire any backup with command line arguments, for instance the following command will create a `demopostgres` backup for the database `postgres`
+
+```console
+kobsidian-backup -d postgres -p -t /tmp/ -f demopostgres 
+Enter value for --password (Database password with backup privileges): 
+```
 
 ## How to generate a GraalVM Native Image executable from Jar File
 
