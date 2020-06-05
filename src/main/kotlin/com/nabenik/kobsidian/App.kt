@@ -1,7 +1,7 @@
 package com.nabenik.kobsidian
 
 import com.nabenik.kobsidian.client.Credential
-import com.nabenik.kobsidian.client.DropboxClient
+import com.nabenik.kobsidian.dropbox.DropboxClient
 import com.nabenik.kobsidian.config.BackupOptions
 import com.nabenik.kobsidian.config.ConfigurationReader
 import com.nabenik.kobsidian.ext.PgBackupCreator
@@ -9,7 +9,6 @@ import com.nabenik.kobsidian.filereader.SystemFileReader
 import picocli.CommandLine
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.concurrent.Callable
 import kotlin.system.exitProcess
 
 class App{
@@ -17,7 +16,11 @@ class App{
     private lateinit var backupConfig: BackupOptions
 
     fun call():Int{
-        val backupName = backupConfig.databaseName + "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) + ".backup"
+        val backupName = if(!backupConfig.backupPrefix.isNullOrEmpty()) {
+            backupConfig.backupPrefix + "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) + ".backup"
+        }else {
+            backupConfig.databaseName + "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) + ".backup"
+        }
 
         //1- Create backup
         val backupCreator = PgBackupCreator()
@@ -28,14 +31,11 @@ class App{
         val inputStream = SystemFileReader().createInputStream(backupConfig.destinationFolder + backupName)
 
         //3- Upload to destination
-        val credential = Credential(backupConfig.dropboxUser!!,
-            backupConfig.dropboxKey!!)
+        val credential = Credential(backupConfig.dropboxSecret!!,
+            backupConfig.dropboxAuthorizationToken!!)
         val client = DropboxClient(credential)
 
-        val result = client.uploadData(backupName, inputStream)
-        println("The result is $result")
-
-        return result
+        return client.uploadData(backupName, inputStream)
     }
 
     companion object{
@@ -60,6 +60,12 @@ class App{
                 val fileOptions = ConfigurationReader.readConfig()
                 val executionOptions = intersectProperties(cmdOptions, fileOptions)
                 checkArguments(cmd, executionOptions)
+
+                if (cmdOptions.bootstrapAuthorizationProcess){ //Exclusive argument
+                    //Fire bootstrap process
+                    DropboxClient.fileAuthenticationFlux(Credential(executionOptions.dropboxKey!!, executionOptions.dropboxSecret!!))
+                    exitProcess(cmd.commandSpec.exitCodeOnSuccess())
+                }
 
                 callableApp.backupConfig = executionOptions
                 val result = callableApp.call()
@@ -86,8 +92,10 @@ class App{
                 cmdOptions.databaseUser ?: fileOptions.databaseUser,
                 cmdOptions.databasePassword ?: fileOptions.databasePassword,
                 cmdOptions.destinationFolder ?: fileOptions.destinationFolder,
-                cmdOptions.dropboxUser ?: fileOptions.dropboxUser,
-                cmdOptions.dropboxKey ?: fileOptions.dropboxKey
+                cmdOptions.dropboxSecret ?: fileOptions.dropboxSecret,
+                cmdOptions.dropboxKey ?: fileOptions.dropboxKey,
+                cmdOptions.dropboxAuthorizationToken ?: fileOptions.dropboxAuthorizationToken,
+                cmdOptions.backupPrefix?: fileOptions.backupPrefix
             )
         }
 
@@ -98,7 +106,7 @@ class App{
             val errorMessage = when {
                 backupOptions.databaseName.isNullOrEmpty() -> "Database name is mandatory"
                 backupOptions.destinationFolder.isNullOrEmpty() -> "Destination folder name is mandatory"
-                backupOptions.dropboxUser.isNullOrEmpty() -> "Dropbox user is mandatory"
+                backupOptions.dropboxSecret.isNullOrEmpty() -> "Dropbox user is mandatory"
                 backupOptions.dropboxKey.isNullOrEmpty() ->"Dropbox key is mandatory"
                 else -> null
             }

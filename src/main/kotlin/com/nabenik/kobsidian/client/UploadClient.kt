@@ -4,7 +4,8 @@ import java.io.InputStream
 
 interface UploadClient{
 
-    public fun uploadData(filename:String, stream: InputStream):Int{
+    fun uploadData(filename:String, stream: InputStream): Int{
         return -1
     }
+
 }

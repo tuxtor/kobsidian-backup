@@ -2,7 +2,7 @@ package com.nabenik.kobsidian.config
 
 import picocli.CommandLine
 
-@CommandLine.Command(name = "kobsidian-backup", mixinStandardHelpOptions = true, version = ["kobsidian-backup 1.0.8"],
+@CommandLine.Command(name = "kobsidian-backup", mixinStandardHelpOptions = true, version = ["kobsidian-backup 1.0.9"],
     description = ["Creates backups from Postgres and uploads these to Dropbox"])
 class BackupOptions{
 
@@ -11,17 +11,21 @@ class BackupOptions{
         this.databaseUser = null
         this.databasePassword = null
         this.destinationFolder = null
-        this.dropboxUser = null
+        this.dropboxSecret = null
         this.dropboxKey = null
+        this.dropboxAuthorizationToken = null
+        this.backupPrefix = null
     }
 
-    constructor(databaseName: String?, databaseUser: String?, databasePassword: String?, destinationFolder: String?, dropboxUser: String?, dropboxKey: String?){
+    constructor(databaseName: String?, databaseUser: String?, databasePassword: String?, destinationFolder: String?, dropboxSecret: String?, dropboxKey: String?, dropboxAuthorizationToken: String?, backupPrefix: String?){
         this.databaseName = databaseName
         this.databaseUser = databaseUser
         this.databasePassword = databasePassword
         this.destinationFolder = destinationFolder
-        this.dropboxUser = dropboxUser
+        this.dropboxSecret = dropboxSecret
         this.dropboxKey = dropboxKey
+        this.dropboxAuthorizationToken = dropboxAuthorizationToken
+        this.backupPrefix = backupPrefix
     }
 
     @CommandLine.Option(names = ["-d", "--database"],
@@ -45,14 +49,30 @@ class BackupOptions{
     )
     var databasePassword: String?
 
-    @CommandLine.Option(names = ["-b", "--dropbox-user"],
-        paramLabel = "DROPBOX USER", description = ["Dropbox user"]
+    @CommandLine.Option(names = ["-s", "--dropbox-secret"],
+        paramLabel = "DROPBOX SECRET", description = ["Dropbox secret"]
     )
-    var dropboxUser: String?
+    var dropboxSecret: String?
 
     @CommandLine.Option(names = ["-k", "--dropbox-key"],
         paramLabel = "DROPBOX KEY", description = ["Dropbox connection key"]
     )
     var dropboxKey: String?
+
+    @CommandLine.Option(names = ["-a", "--dropbox-token"],
+            paramLabel = "DROPBOX AUTH TOKEN", description = ["Dropbox authorization token"]
+    )
+    var dropboxAuthorizationToken: String?
+
+    @CommandLine.Option(names = ["-f", "--backup-prefix"],
+            paramLabel = "OPTIONAL BACKUP PREFIX", description = ["Optional backup prefix on backup uploads"]
+    )
+    var backupPrefix: String?
+
+    @CommandLine.Option(names = ["-b", "--bootstrap-auth"],
+            paramLabel = "BOOTSTRAP AUTHORIZATION FLUX", description = ["Bootstraps dropbox authorization process"]
+    )
+    var bootstrapAuthorizationProcess = false
+
 
 }
