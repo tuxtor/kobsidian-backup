@@ -2,7 +2,7 @@ package com.nabenik.kobsidian.config
 
 import picocli.CommandLine
 
-@CommandLine.Command(name = "kobsidian-backup", mixinStandardHelpOptions = true, version = ["kobsidian-backup 1.0.7"],
+@CommandLine.Command(name = "kobsidian-backup", mixinStandardHelpOptions = true, version = ["kobsidian-backup 1.0.9"],
     description = ["Creates backups from Postgres and uploads these to Dropbox"])
 class BackupOptions{
 
