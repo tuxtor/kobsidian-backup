@@ -20,7 +20,7 @@ pipelines:
           name: Deploy artifacts using SCP to PROD
           deployment: production
           script:
-            - pipe: atlassian/bitbucket-upload-file:0.1.2
+            - pipe: atlassian/bitbucket-upload-file:0.1.5
               variables:
                 BITBUCKET_USERNAME: $BITBUCKET_USERNAME
                 BITBUCKET_APP_PASSWORD: $BITBUCKET_APP_PASSWORD
